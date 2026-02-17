@@ -27,7 +27,7 @@ jobs:
           DOTNET_RESOURCE_SERVICE_ENDPOINT_URL: https://localhost:19076
       - name: Probe Application Readiness
         run: |
-          for i in {1..30}; do curl -sS -o /dev/null http://127.0.0.1:19888 && exit 0 || sleep 5; done; exit 1
+          for i in {1..30}; do curl -sS -o /dev/null http://127.0.0.1:18848 && exit 0 || sleep 5; done; exit 1
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -50,5 +50,5 @@ jobs:
           BRIGHT_AUTH_ID: ${{ vars.BRIGHT_AUTH_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRIGHT_TOKEN: ${{ env.BRIGHT_TOKEN }}
-          BRIGHT_TARGET_URL: http://127.0.0.1:19888
+          BRIGHT_TARGET_URL: http://127.0.0.1:18848
           SECTESTER_SCAN_POOL_SIZE: ${{ vars.SECTESTER_SCAN_POOL_SIZE }}
