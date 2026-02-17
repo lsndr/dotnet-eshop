@@ -1,0 +1,29 @@
+name: 'Configure Bright Credentials'
+description: 'Retrieves OIDC token from GitHub, exchanges it with BrightSec, and exports BRIGHT_TOKEN.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Retrieve OIDC Token and Exchange with BrightSec
+      shell: bash
+      run: |
+        set -e
+        if [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is not set."
+          exit 1
+        fi
+        if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+          echo "ACTIONS_ID_TOKEN_REQUEST_URL is not set."
+          exit 1
+        fi
+        OIDC_TOKEN=$(curl -sSL -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://development.playground.brightsec.com" | jq -r '.value')
+        if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
+          echo "OIDC token retrieval failed."
+          exit 1
+        fi
+        BRIGHT_RESPONSE=$(curl -sSL -X POST "https://development.playground.brightsec.com/api/v1/auth/oidc" -H "Content-Type: application/json" -d "{\"token\":\"$OIDC_TOKEN\"}")
+        PURE_KEY=$(echo "$BRIGHT_RESPONSE" | jq -r '.pureKey')
+        if [ -z "$PURE_KEY" ] || [ "$PURE_KEY" = "null" ]; then
+          echo "BrightSec token exchange failed: $BRIGHT_RESPONSE"
+          exit 1
+        fi
+        echo "BRIGHT_TOKEN=$PURE_KEY" >> $GITHUB_ENV
