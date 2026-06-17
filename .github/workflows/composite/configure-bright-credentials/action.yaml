@@ -10,9 +10,6 @@ inputs:
   BRIGHT_TOKEN:
     description: 'Pre-configured token'
     required: false
-  BRIGHT_OIDC_AUDIENCE:
-    description: 'OIDC audience for BrightSec token exchange'
-    required: true
 
 runs:
   using: 'composite'
@@ -33,13 +30,10 @@ runs:
       env:
         BRIGHT_HOSTNAME: ${{ inputs.BRIGHT_HOSTNAME }}
         BRIGHT_PROJECT_ID: ${{ inputs.BRIGHT_PROJECT_ID }}
-        BRIGHT_OIDC_AUDIENCE: ${{ inputs.BRIGHT_OIDC_AUDIENCE }}
       run: |
-        if [ -z "$BRIGHT_OIDC_AUDIENCE" ]; then echo "Error: BRIGHT_OIDC_AUDIENCE is required" >&2; exit 1; fi
-
         # Retrieve OIDC token from GitHub
         OIDC_TOKEN=$(curl -sS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-        "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${BRIGHT_OIDC_AUDIENCE}" | jq -r '.value')
+        "${ACTIONS_ID_TOKEN_REQUEST_URL}" | jq -r '.value')
 
         # Post the token to BrightSec
         RESPONSE=$(curl -s -X POST "https://${BRIGHT_HOSTNAME}/api/v1/projects/${BRIGHT_PROJECT_ID}/api-keys/oidc" \
