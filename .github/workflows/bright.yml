@@ -50,7 +50,7 @@ jobs:
           BRIGHT_HOSTNAME: development.playground.brightsec.com
           BRIGHT_PROJECT_ID: awePXVyMJ5FMTT5Agf4uGk
           BRIGHT_TOKEN: ${{ secrets.BRIGHT_TOKEN }}
-          BRIGHT_OIDC_AUDIENCE: ${{ vars.BRIGHT_OIDC_AUDIENCE }}
+          BRIGHT_OIDC_AUDIENCE: development.playground.brightsec.com
 
       - name: Run security tests
         run: |
