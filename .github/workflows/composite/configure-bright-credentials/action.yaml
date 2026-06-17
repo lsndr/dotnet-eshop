@@ -35,9 +35,19 @@ runs:
         BRIGHT_PROJECT_ID: ${{ inputs.BRIGHT_PROJECT_ID }}
         BRIGHT_OIDC_AUDIENCE: ${{ inputs.BRIGHT_OIDC_AUDIENCE }}
       run: |
+        if [ -z "$BRIGHT_OIDC_AUDIENCE" ]; then
+          echo "Error: BRIGHT_OIDC_AUDIENCE is required for OIDC token exchange." 1>&2
+          exit 1
+        fi
+
         # Retrieve OIDC token from GitHub
         OIDC_TOKEN=$(curl -sS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
         "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${BRIGHT_OIDC_AUDIENCE}" | jq -r '.value')
+
+        if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
+          echo "Error: Failed to retrieve OIDC token from GitHub." 1>&2
+          exit 1
+        fi
 
         # Post the token to BrightSec
         RESPONSE=$(curl -s -X POST "https://${BRIGHT_HOSTNAME}/api/v1/projects/${BRIGHT_PROJECT_ID}/api-keys/oidc" \
