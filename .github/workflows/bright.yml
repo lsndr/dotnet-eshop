@@ -28,7 +28,7 @@ jobs:
           global-json-file: global.json
       - name: Restore dependencies
         run: |
-          dotnet restore eShop.slnx
+          dotnet restore src/eShop.AppHost/eShop.AppHost.csproj
         env:
           CI_AGENT_STEP_NAME: Restore dependencies
           CI_AGENT_STEP_INDEX: "3"
